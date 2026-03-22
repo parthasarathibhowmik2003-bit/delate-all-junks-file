@@ -1,0 +1,653 @@
+<!-- popup.html - Main Extension Interface -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junk File Cleaner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 380px;
+            min-height: 500px;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eaeaea;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: #8892b0;
+            margin-top: 5px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #00d4aa;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #8892b0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+        }
+
+        .section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ccd6f6;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .junk-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .junk-tag {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .junk-tag:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .junk-tag.active {
+            background: rgba(239, 68, 68, 0.4);
+            color: #fff;
+        }
+
+        .file-list {
+            max-height: 150px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .file-icon.temp { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+        .file-icon.cache { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .file-icon.log { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+        .file-icon.duplicate { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+
+        .file-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            color: #eaeaea;
+            font-weight: 500;
+        }
+
+        .file-size {
+            color: #8892b0;
+            font-size: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4aa, #00a8e8);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 212, 170, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 170, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #eaeaea;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .progress-container {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00d4aa, #00a8e8);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: #8892b0;
+            margin-top: 8px;
+        }
+
+        .success-message {
+            display: none;
+            background: rgba(0, 212, 170, 0.15);
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            color: #00d4aa;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .toggle-switch:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            color: #ccd6f6;
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle.active {
+            background: #00d4aa;
+        }
+
+        .toggle-knob {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s;
+        }
+
+        .toggle.active .toggle-knob {
+            left: 22px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #8892b0;
+        }
+
+        .empty-state-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">🧹</div>
+        <h1>Junk File Cleaner</h1>
+        <div class="subtitle">Clean browser downloads & temp files</div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="junkFiles">0</div>
+            <div class="stat-label">Junk Files</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="spaceSaved">0 MB</div>
+            <div class="stat-label">Can Save</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            <span>⚠️</span> Select Junk Types
+        </div>
+        <div class="junk-types">
+            <span class="junk-tag active" data-type="temp">.tmp / .temp</span>
+            <span class="junk-tag active" data-type="cache">.cache / .crdownload</span>
+            <span class="junk-tag active" data-type="log">.log / .old</span>
+            <span class="junk-tag" data-type="duplicate">Duplicates</span>
+            <span class="junk-tag active" data-type="download">Failed Downloads</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">
+            <span>📁</span> Found Files
+        </div>
+        <div class="file-list" id="fileList">
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <div>Click "Scan" to find junk files</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="toggle-switch">
+            <span class="toggle-label">Auto-clean on browser close</span>
+            <div class="toggle" id="autoClean">
+                <div class="toggle-knob"></div>
+            </div>
+        </div>
+        <div class="toggle-switch">
+            <span class="toggle-label">Confirm before deleting</span>
+            <div class="toggle active" id="confirmDelete">
+                <div class="toggle-knob"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary" id="scanBtn">
+        <span>🔍</span> Scan for Junk Files
+    </button>
+
+    <button class="btn btn-secondary" id="cleanBtn" style="display: none;">
+        <span>🗑️</span> Clean Selected Files
+    </button>
+
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">Scanning...</div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        ✅ Successfully cleaned <span id="cleanedCount">0</span> files!
+    </div>
+
+    <script>
+        // State management
+        const state = {
+            junkTypes: new Set(['temp', 'cache', 'log', 'download']),
+            filesFound: [],
+            autoClean: false,
+            confirmDelete: true,
+            isScanning: false
+        };
+
+        // DOM elements
+        const scanBtn = document.getElementById('scanBtn');
+        const cleanBtn = document.getElementById('cleanBtn');
+        const fileList = document.getElementById('fileList');
+        const junkFiles = document.getElementById('junkFiles');
+        const spaceSaved = document.getElementById('spaceSaved');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const successMessage = document.getElementById('successMessage');
+
+        // Junk file patterns
+        const junkPatterns = {
+            temp: /\.(tmp|temp|~)$/i,
+            cache: /\.(cache|crdownload|part|partial)$/i,
+            log: /\.(log|old|bak|backup)$/i,
+            duplicate: null, // Special handling
+            download: null    // Failed downloads
+        };
+
+        // Toggle junk type selection
+        document.querySelectorAll('.junk-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                const type = tag.dataset.type;
+                if (tag.classList.contains('active')) {
+                    tag.classList.remove('active');
+                    state.junkTypes.delete(type);
+                } else {
+                    tag.classList.add('active');
+                    state.junkTypes.add(type);
+                }
+            });
+        });
+
+        // Toggle switches
+        document.getElementById('autoClean').addEventListener('click', function() {
+            this.classList.toggle('active');
+            state.autoClean = this.classList.contains('active');
+        });
+
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            this.classList.toggle('active');
+            state.confirmDelete = this.classList.contains('active');
+        });
+
+        // Simulate scanning downloads
+        async function scanJunkFiles() {
+            state.isScanning = true;
+            scanBtn.disabled = true;
+            scanBtn.innerHTML = '<span>⏳</span> Scanning...';
+            progressContainer.style.display = 'block';
+            
+            // Simulate progress
+            for (let i = 0; i <= 100; i += 10) {
+                progressFill.style.width = i + '%';
+                progressText.textContent = `Scanning downloads... ${i}%`;
+                await sleep(200);
+            }
+
+            // Generate mock junk files (in real extension, this queries chrome.downloads)
+            state.filesFound = generateMockFiles();
+            
+            displayFiles();
+            updateStats();
+            
+            progressContainer.style.display = 'none';
+            scanBtn.style.display = 'none';
+            cleanBtn.style.display = 'flex';
+            state.isScanning = false;
+        }
+
+        function generateMockFiles() {
+            const files = [];
+            const types = Array.from(state.junkTypes);
+            
+            for (let i = 0; i < 15; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const size = Math.floor(Math.random() * 500) + 1;
+                
+                const file = {
+                    id: i,
+                    name: generateFileName(type),
+                    type: type,
+                    size: size,
+                    path: `C:\\Users\\Downloads\\${generateFileName(type)}`
+                };
+                
+                files.push(file);
+            }
+            
+            return files.sort((a, b) => b.size - a.size);
+        }
+
+        function generateFileName(type) {
+            const names = {
+                temp: ['setup.tmp', 'install_temp.tmp', 'update~', 'cache.temp', 'session.tmp'],
+                cache: ['video.crdownload', 'file.part', 'download.cache', 'data.partial'],
+                log: ['error.log', 'debug.old', 'app.bak', 'system.log'],
+                duplicate: ['report (1).pdf', 'image_copy.jpg', 'document (2).docx'],
+                download: ['failed_download.zip', 'incomplete.exe', 'broken.pdf']
+            };
+            
+            const list = names[type] || names.temp;
+            return list[Math.floor(Math.random() * list.length)] + Math.floor(Math.random() * 100);
+        }
+
+        function displayFiles() {
+            if (state.filesFound.length === 0) {
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✨</div>
+                        <div>No junk files found!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            fileList.innerHTML = state.filesFound.map(file => `
+                <div class="file-item" data-id="${file.id}">
+                    <div class="file-info">
+                        <div class="file-icon ${file.type}">
+                            ${getFileIcon(file.type)}
+                        </div>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${file.size} MB • ${file.type.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: #00d4aa;">
+                </div>
+            `).join('');
+        }
+
+        function getFileIcon(type) {
+            const icons = {
+                temp: '🔥',
+                cache: '💾',
+                log: '📋',
+                duplicate: '👥',
+                download: '❌'
+            };
+            return icons[type] || '📄';
+        }
+
+        function updateStats() {
+            const totalFiles = state.filesFound.length;
+            const totalSize = state.filesFound.reduce((sum, f) => sum + f.size, 0);
+            
+            junkFiles.textContent = totalFiles;
+            spaceSaved.textContent = totalSize > 1024 ? 
+                (totalSize / 1024).toFixed(1) + ' GB' : 
+                totalSize + ' MB';
+        }
+
+        async function cleanFiles() {
+            const checkboxes = document.querySelectorAll('.file-item input:checked');
+            const toDelete = Array.from(checkboxes).map(cb => 
+                parseInt(cb.closest('.file-item').dataset.id)
+            );
+
+            if (toDelete.length === 0) {
+                alert('No files selected!');
+                return;
+            }
+
+            if (state.confirmDelete) {
+                if (!confirm(`Delete ${toDelete.length} files?`)) return;
+            }
+
+            // Show progress
+            cleanBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            
+            // Simulate deletion
+            for (let i = 0; i <= 100; i += 20) {
+                progressFill.style.width = i + '%';
+                progressText.textContent = `Cleaning files... ${i}%`;
+                await sleep(300);
+            }
+
+            // Remove deleted files from state
+            state.filesFound = state.filesFound.filter(f => !toDelete.includes(f.id));
+            
+            // Show success
+            progressContainer.style.display = 'none';
+            document.getElementById('cleanedCount').textContent = toDelete.length;
+            successMessage.style.display = 'block';
+            
+            // Reset UI
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+                scanBtn.style.display = 'flex';
+                scanBtn.disabled = false;
+                scanBtn.innerHTML = '<span>🔍</span> Scan Again';
+                cleanBtn.style.display = 'none';
+                cleanBtn.disabled = false;
+                fileList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✨</div>
+                        <div>All clean! No junk files found.</div>
+                    </div>
+                `;
+                junkFiles.textContent = '0';
+                spaceSaved.textContent = '0 MB';
+            }, 2000);
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Event listeners
+        scanBtn.addEventListener('click', scanJunkFiles);
+        cleanBtn.addEventListener('click', cleanFiles);
+
+        // Initialize
+        console.log('Junk File Cleaner Extension Loaded');
+    </script>
+</body>
+</html>
