@@ -1,1 +1,1 @@
-# delate-all-junks-file
+<h1>link: https://junkfile.oneapp.dev/</h1>
